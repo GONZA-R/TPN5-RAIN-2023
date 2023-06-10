@@ -254,7 +254,7 @@ while True:
                 """
                 while True:
                     try:
-                        numero = int(input("Ingresa un número del 1 al 5: "))
+                        numero = int(input("\nIngresa un numero del documento de prueba del 1 al 5: "))
                         if 1 <= numero <= 5:
                             break
                         else:
@@ -270,19 +270,21 @@ while True:
                 elemento = lista_archivos_pdf[indice_docu]
     
                 # Imprimir el índice y el elemento elegido
-                print("Documento para prueba es el : {}, Elemento: {}".format(indice_docu+1, elemento))
+                print("\nDocumento para elegido para la prueba es el : {}\n".format(elemento))
 
 
                 copialistapdfs=list(lista_archivos_pdf)
-                # Eliminar el elemento en el índice de la lista
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
                 del copialistapdfs[indice_docu]
 
-
+                #Copia de la lista de documentos original para trabajar
                 aux_documentos_pdf=list(documentos_pdf)
                 del aux_documentos_pdf[indice_docu]
 
-                
+                #Se establece los elementos del documento de prueba
                 docprueba=documentos_pdf[indice_docu]
+
+                #Se comienza hacer la comparacion
 
                 max_similitud = 0.0
                 doc1_max = ""
@@ -295,6 +297,10 @@ while True:
                     print("Similitud coseno: {:.2f} entre el {} con en el  {}".format(similitud,elemento,copialistapdfs[i]))
                 
                 print("\nLa máxima similitud de {:.2f} se encuentra entre {} y {}\n".format(max_similitud,elemento,doc1_max))
+
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistapdfs=list(lista_archivos_pdf)
+                aux_documentos_pdf=list(documentos_pdf)
 
 
 
