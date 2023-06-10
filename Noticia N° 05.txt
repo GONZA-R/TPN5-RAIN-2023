@@ -1,0 +1,25 @@
+Título: 
+La billetera de Google ya puede descargarse para ser utilizada en la Argentina
+
+Resumen: 
+En las redes sociales muchos usuarios comentaron que ya tienen la herramienta en sus celulares y que pudieron cargarle los datos de tarjetas de crédito de bancos argentinos
+
+Contenido: 
+
+6 Jun, 2023
+Por  Fernando Meaños
+Google Wallet, la billetera electrónica utilizada en todo el mundo administrada por el gigante de Internet, ya puede descargarse en la Argentina para para hacer pagos “contactless” en comercios con tarjetas de crédito o débito emitidas en el país. Muchos usuarios, en especial habituados a usar la herramienta en otros países, comenzaron a comentar la novedad en redes sociales y a compartir experiencias acerca de su utilización.
+El mecanismo para registrarse, de acuerdo a lo que pudo comprobar Infobae, es rápido y simple. Una vez descargada la app en el teléfono celular, algo que lleva pocos segundos, hace falta anotar los datos personales, incluyendo un teléfono y un correo electrónico de Gmail. Una vez cumplido ese paso, ya es posible cargar tarjetas de crédito de bancos argentinos. Para ese fin, se pide un nuevo paso de seguridad, tal como recibir un código numérico a través de un SMS o acreditar a través de un llamado al banco emisor. La billetera también permite designarla como “medio de pago predeterminado” en caso de que en el mismo teléfono celular estén cargadas herramientas de uso similar.
+Si bien desde la empresa aún no se informó sobre su disponibilidad en el país muchos usuarios esperaban esa posibilidad y la noticia empezó a expandirse por las redes. Quienes ya la utilizaban con tarjetas emitidas en el extranjero, podrán ahora agregar las de los bancos argentinos.
+Al momento de su lanzamiento en otros lugares del mundo, desde Google se había explicado que la aplicación Wallet permite más opciones que almacenar las tarjetas de crédito y débito ya que también está destinada a cargar otra clase de productos como las tarjetas de fidelidad de supermercados o cadenas comerciales para acumular puntos o premios, gift cards para hacer regalos, certificados de vacunación Covid, tarjetas de embarque para un vuelo y las tarjetas para viajar en transporte público.
+Sobre esto último, el usuario @MockelH se adelantó a pedir: “Salió Google Wallet en ARG. @TarjetaSUBEok dale habilitá que podamos cargar la tarjeta y pagar con el reloj”. Otro usuario de un blog especializado en viajes, @SirChandlerBlog, señaló: “Esto es muy útil para la vida diaria, pero fundamental para los viajes. Ciudades con sistemas más ABIERTOS que el de la SUBE, permiten el pago directo con los celulares en el transporte público. Así es en Río de Janeiro, Londres o New York”.
+Habrá que esperar para saber cuáles de esas opciones serán posibles en la Argentina. Lo cierto es que la característica principal de la billetera Google Wallet y de Google Pay es que funciona con el sistema contactless (sin contacto), es decir, acercando el propio celular a la terminal POS (más conocida como posnet, una de sus marcas) para que se registre el pago. De esa forma, en algunos casos puede acortar al mínimo el momento del pago en comparación con otras alternativas. Ya casi en desuso la opción de pagar con tarjeta, esperar un ticket y firmarlo, el pago a través de esta vía busca no tener la necesidad de llevar todas las tarjetas en el bolsillo sino cargarlas “digitalmente” en el celular. También se diferencia de los pagos con código QR, muy difundidos en la Argentina, que requieren abrir la aplicación y enfocar con la cámara del celular antes de concretar el pago.
+La clave para poder disponer de este medio de pago, muy utilizado en muchos países del mundo, es que el teléfono celular cuente con la tecnología NFC, algo que también viene expandiéndose en los últimos años en la Argentina. Esa tecnología presente en muchos celulares Android del mercado es la que viabiliza el “pago por aproximación”, simplemente acercando el teléfono a la terminal POS sin necesidad de utilizar la tarjeta de plástico.
+Seguir leyendo:
+
+URLs de las imagenes:
+
+https://cloudfront-us-east-1.images.arcpublishing.com/infobae/4EEIF7PP5NDLVDXJKYF22K7A7I.jpg
+https://cloudfront-us-east-1.images.arcpublishing.com/infobae/M3JVQCQCRRCH7FJFZXK6DRJVQU.jpg
+https://cloudfront-us-east-1.images.arcpublishing.com/infobae/F4HC3VERWVGZDG6CQ7DOT4RBUM.jpg
+
