@@ -172,8 +172,32 @@ def obtener_bigramas(lista_elementos):
 
 # FIN Funciones punto 2
 #####################################################################################################
+import openpyxl
+
+def generar_excel(ranking,nombre):
+
+    # Crear un nuevo archivo Excel
+    libro_excel = openpyxl.Workbook()
+    hoja = libro_excel.active
+
+    # Agregar encabezados
+    hoja.cell(row=1, column=1).value = "Ranking"
+    hoja.cell(row=1, column=2).value = "Score"
+    hoja.cell(row=1, column=3).value = "Documento"
+    hoja.cell(row=1, column=4).value = "Contenido"
 
 
+    # Guardar los resultados en el archivo Excel
+    fila = 2
+    for i, (similitud, documento, contenido) in enumerate(ranking):
+        hoja.cell(row=fila, column=1).value = i+1
+        hoja.cell(row=fila, column=2).value="{:.3f}".format(similitud)
+        hoja.cell(row=fila, column=3).value = documento
+        hoja.cell(row=fila, column=4).value = contenido
+        fila += 1
+
+    # Guardar el archivo Excel
+    libro_excel.save(nombre)
 
 #####################################################################################################
 
@@ -268,12 +292,28 @@ while True:
             lista=eliminar_stopwords(lista)
             lista=eliminar_caracteres_unicos(lista)
             docupdflistlimpios.append(lista)
+        
+        docutxtlistlimpios=[]
+
+        for docutxt in documentos_txt:
+            docutxt=eliminar_links(docutxt)
+            docupdf=eliminar_caracteres(docutxt)
+
+            lista = docutxt.split()
+            lista = [elemento.lower() for elemento in lista]
+            
+            lista=eliminar_parentesis_corchetes(lista)
+            lista=eliminar_numeros_lista(lista)
+            lista = list(filter(None, lista))
+            lista=eliminar_stopwords(lista)
+            lista=eliminar_caracteres_unicos(lista)
+            docutxtlistlimpios.append(lista)
 
 
 ##########################################################################################
 
 
-
+        #SUB MENU
         while True:
             clear_screen()
             print("¡Ahora selecciona un opcion para lo cual trabajar con el documento de prueba!"+"\n\n")
@@ -286,8 +326,9 @@ while True:
             subopcion = input("Ingrese una opción: ")
             if subopcion == "1":
                 clear_screen()
-                
-                print("Texto original de los documentos PDFs")
+                #REP A
+
+                print("REP A Texto original de los documentos PDFs")
                 # Obtener un índice dentro del rango de la lista
                 indice_docu = numero-1
                 # Obtener el elemento correspondiente al índice aleatorio
@@ -304,32 +345,100 @@ while True:
                 docprueba=documentos_pdf[indice_docu]
 
 
-                #Se comienza hacer la comparacion
+                # Se comienza a hacer la comparación
                 max_similitud = 0.0
                 doc1_max = ""
-
+                similitudes = []
                 print("\nResultado de comparaciones...\n")
+
                 for i in range(len(aux_documentos_pdf)):
                     similitud = compara_texto_original(docprueba, aux_documentos_pdf[i])
                     if similitud > max_similitud:
                         max_similitud = similitud
                         doc1_max = copialistapdfs[i]
-                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                    print("Similitud coseno: {:.2f} entre el {} con el {}".format(similitud, elemento, copialistapdfs[i]))
+                    similitudes.append((similitud, copialistapdfs[i],aux_documentos_pdf[i]))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
 
 
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                
+                
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
                 aux_documentos_pdf=list(documentos_pdf)
 
+                generar_excel(ranking,"RepA_TextoOriginal_PDFs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP A...\n")
+                input("\nPresione enter para continuar...\n")
+                clear_screen()
+
+                #######################################################################################################################
+                # REP B
+                clear_screen()
+                print("REP B Texto original de los documentos TXTs")
+
+                # Obtener un índice dentro del rango de la lista
+                indice_docu = numero-1
+                # Obtener el elemento correspondiente al índice aleatorio
+                elemento = lista_archivos_txt[indice_docu]
+                # Imprimir el índice y el elemento elegido
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
+                copialistatxts=list(lista_archivos_txt)
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
+                del copialistatxts[indice_docu]
+
+                #Copia de la lista de documentos original para trabajar
+                aux_documentos_txt=list(documentos_txt)
+                del aux_documentos_txt[indice_docu]
+                #Se establece los elementos del documento de prueba
+                docprueba=documentos_txt[indice_docu]
 
 
-                input("Presione enter para continuar...")
+                # Se comienza a hacer la comparación
+                max_similitud = 0.0
+                doc1_max = ""
+                similitudes = []
+                print("\nResultado de comparaciones...\n")
+
+                for i in range(len(aux_documentos_txt)):
+                    similitud = compara_texto_original(docprueba, aux_documentos_txt[i])
+                    if similitud > max_similitud:
+                        max_similitud = similitud
+                        doc1_max = copialistatxts[i]
+                    print("Similitud coseno: {:.2f} entre el {} con el {}".format(similitud, elemento, copialistatxts[i]))
+                    similitudes.append((similitud, copialistatxts[i],aux_documentos_txt[i]))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
+
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                
+                
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistatxts=list(lista_archivos_txt)
+                aux_documentos_txt=list(documentos_txt)
+
+                generar_excel(ranking,"RepB_TextoOriginal_TXTs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP B...\n")
+
+
+##################################################################################
+                input("\nPresione enter para continuar...")
             elif subopcion == "2":
 
 
                 clear_screen()
-                print("Eliminando STOPWORDs del texto original de los documentos PDFs")
+                print("REP A Texto original sin STOPWORDS de los documentos PDFs")
 
                 # Obtener un índice dentro del rango de la lista
                 indice_docu = numero-1
@@ -354,6 +463,7 @@ while True:
                 #Se comienza hacer la comparacion
                 max_similitud = 0.0
                 doc1_max = ""
+                similitudes = []
 
                 print("\nResultado de comparaciones...\n")
                 for i in range(len(aux_documentos_pdf)):
@@ -362,19 +472,87 @@ while True:
                         max_similitud = similitud
                         doc1_max = copialistapdfs[i]
                     print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                    similitudes.append((similitud, copialistapdfs[i],' '.join(aux_documentos_pdf[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
 
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
                 aux_documentos_pdf=list(docupdflistlimpios)
+
+                generar_excel(ranking,"RepA_SinStopWords_PDFs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP A...\n")
+                input("\nPresione enter para continuar...\n")
+                clear_screen()
+                #######################################################################################################################
+                # REP B
+                clear_screen()
+                print("REP B Texto original sin STOPWORDS de los documentos TXTs")
+
+
+                 # Obtener un índice dentro del rango de la lista
+                indice_docu = numero-1
+                # Obtener el elemento correspondiente al índice aleatorio
+                elemento = lista_archivos_txt[indice_docu]
+                # Imprimir el índice y el elemento elegido
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
+                copialistatxts=list(lista_archivos_txt)
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
+                del copialistatxts[indice_docu]
+
+
+
+                #Copia de la lista de documentos sin stopwords para trabajar
+                aux_documentos_txt=list(docutxtlistlimpios)
+
+                #Se establece los elementos del documento de prueba
+                docprueba=aux_documentos_txt[indice_docu]
+                del aux_documentos_txt[indice_docu]
+
+
+                #Se comienza hacer la comparacion
+                max_similitud = 0.0
+                doc1_max = ""
+                similitudes = []
+
+                print("\nResultado de comparaciones...\n")
+                for i in range(len(aux_documentos_txt)):
+                    similitud = compare_lists(docprueba, aux_documentos_txt[i])
+                    if similitud > max_similitud:
+                        max_similitud = similitud
+                        doc1_max = copialistatxts[i]
+                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistatxts[i]))
+                    similitudes.append((similitud, copialistatxts[i],' '.join(aux_documentos_txt[i])))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
                 
+
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistatxts=list(lista_archivos_txt)
+                aux_documentos_txt=list(docutxtlistlimpios)
+
+                generar_excel(ranking,"RepB_SinStopWords_TXTs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP B...\n")
 
 
                 input("Presione enter para continuar...")
+
             elif subopcion == "3":
                 clear_screen()
-                print("Realizando STEMMING de los documentos PDFs")
+                print("REP A Realizando STEMMING de los documentos PDFs")
 
                 # Obtener un índice dentro del rango de la lista
                 indice_docu = numero-1
@@ -398,19 +576,17 @@ while True:
                     listdocustemm.append(docu)
                 
 
-                print(listdocustemm[0])
-
                 #Se establece los elementos del documento de prueba
                 docprueba=listdocustemm[indice_docu]
                 del listdocustemm[indice_docu]
 
-
-                
-
-                
+      
                 #Se comienza hacer la comparacion
                 max_similitud = 0.0
                 doc1_max = ""
+                similitudes = []
+
+                
 
                 print("\nResultado de comparaciones...\n")
                 for i in range(len(listdocustemm)):
@@ -419,16 +595,94 @@ while True:
                         max_similitud = similitud
                         doc1_max = copialistapdfs[i]
                     print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                    similitudes.append((similitud, copialistapdfs[i],' '.join(listdocustemm[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+                
+
+
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
+
+                generar_excel(ranking,"RepA_Stemming_PDFs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP A...\n")
+                input("\nPresione enter para continuar...\n")
+                clear_screen()
+                #######################################################################################################################
+                # REP B
+                clear_screen()
+                print("REP B Realizando STEMMING de los documentos TXTs")
+
+                # Obtener un índice dentro del rango de la lista
+                indice_docu = numero-1
+                # Obtener el elemento correspondiente al índice aleatorio
+                elemento = lista_archivos_txt[indice_docu]
+                # Imprimir el índice y el elemento elegido
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
+
+                copialistatxts=list(lista_archivos_txt)
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
+                del copialistatxts[indice_docu]
+
+
+                #Copia de la lista de documentos sin stopwords para trabajar
+                aux_documentos_txt=list(docutxtlistlimpios)
+
+                listdocustemm=[]
+
+                for docu in aux_documentos_txt:
+                    docu=algoritmo_snowball(docu)
+                    listdocustemm.append(docu)
                 
 
-                input("Presione enter para continuar...")   
+                #Se establece los elementos del documento de prueba
+                docprueba=listdocustemm[indice_docu]
+                del listdocustemm[indice_docu]
+
+      
+                #Se comienza hacer la comparacion
+                max_similitud = 0.0
+                doc1_max = ""
+                similitudes = []
+
+                print("\nResultado de comparaciones...\n")
+                for i in range(len(listdocustemm)):
+                    similitud = compare_lists(docprueba, listdocustemm[i])
+                    if similitud > max_similitud:
+                        max_similitud = similitud
+                        doc1_max = copialistatxts[i]
+                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistatxts[i]))
+                    similitudes.append((similitud, copialistatxts[i],' '.join(listdocustemm[i])))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+                
+
+
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistatxts=list(lista_archivos_txt)
+
+                generar_excel(ranking,"RepB_Stemming_PDFs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP B...\n")
+         
+
+                input("Presione enter para continuar...")
+
+
             elif subopcion == "4":
                 clear_screen()
-                print("Realizando BI-GRAMAS de los documentos PDFs")
+                print("REP A Realizando BI-GRAMAS de los documentos PDFs")
 
                 # Obtener un índice dentro del rango de la lista
                 indice_docu = numero-1
@@ -451,9 +705,6 @@ while True:
                     docu=obtener_bigramas(docu)
                     listdocubigramm.append(docu)
                 
-
-                print(listdocubigramm[0])
-
                 #Se establece los elementos del documento de prueba
                 docprueba=listdocubigramm[indice_docu]
                 del listdocubigramm[indice_docu]
@@ -462,6 +713,7 @@ while True:
                 #Se comienza hacer la comparacion
                 max_similitud = 0.0
                 doc1_max = ""
+                similitudes=[]
 
                 print("\nResultado de comparaciones...\n")
                 for i in range(len(listdocubigramm)):
@@ -470,12 +722,81 @@ while True:
                         max_similitud = similitud
                         doc1_max = copialistapdfs[i]
                     print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                    similitudes.append((similitud, copialistapdfs[i],' '.join(listdocubigramm[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
 
+                generar_excel(ranking,"RepA_BIGRAMAS_PDFs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP A...\n")
+                input("\nPresione enter para continuar...\n")
+                clear_screen()
+                #######################################################################################################################
+                # REP B
+                clear_screen()
+                print("REP B Realizando BI-GRAMAS de los documentos PDFs")
 
+                # Obtener un índice dentro del rango de la lista
+                indice_docu = numero-1
+                # Obtener el elemento correspondiente al índice aleatorio
+                elemento = lista_archivos_txt[indice_docu]
+                # Imprimir el índice y el elemento elegido
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
+
+                copialistatxts=list(lista_archivos_txt)
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
+                del copialistatxts[indice_docu]
+
+
+                #Copia de la lista de documentos sin stopwords para trabajar
+                aux_documentos_txt=list(docutxtlistlimpios)
+
+                listdocubigramm=[]
+
+                for docu in aux_documentos_txt:
+                    docu=obtener_bigramas(docu)
+                    listdocubigramm.append(docu)
+                
+                #Se establece los elementos del documento de prueba
+                docprueba=listdocubigramm[indice_docu]
+                del listdocubigramm[indice_docu]
+
+
+                #Se comienza hacer la comparacion
+                max_similitud = 0.0
+                doc1_max = ""
+                similitudes=[]
+
+                print("\nResultado de comparaciones...\n")
+                for i in range(len(listdocubigramm)):
+                    similitud = compare_lists(docprueba, listdocubigramm[i])
+                    if similitud > max_similitud:
+                        max_similitud = similitud
+                        doc1_max = copialistatxts[i]
+                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistatxts[i]))
+                    similitudes.append((similitud, copialistatxts[i],' '.join(listdocubigramm[i])))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
+                similitudes.sort(reverse=True)
+                ranking = similitudes[:3]
+
+                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+                for i, (similitud, documento,contenido) in enumerate(ranking):
+                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistapdfs=list(lista_archivos_txt)
+
+                generar_excel(ranking,"RepB_BIGRAMAS_PDFs.xlsx")
+                print("\nSe genero un archivo Excel con los resultados del REP B...\n")
 
                 input("Presione enter para continuar...") 
             elif subopcion == "5":
