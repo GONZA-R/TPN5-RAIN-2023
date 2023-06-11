@@ -1,21 +1,15 @@
 ############################
 #Borrar pantalla
 
-
 # GRUPO 18
 import os
 import string
-
-
 
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 ############################
 #####################################################################################################
 # Funciones punto 1
-
-
-
 
 def calcular_indices(recuperados, relevantes_consulta,cant_reg_relevantes):
     recall = relevantes_consulta / cant_reg_relevantes # Total de documentos relevantes en la base de datos
@@ -32,21 +26,6 @@ def calcular_indices(recuperados, relevantes_consulta,cant_reg_relevantes):
 # Funciones punto 2
 #####################################################################################################
 
-"""
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-def compare_texts(text1, text2):
-    # Vectorización de los textos utilizando TF-IDF sin eliminar stopwords
-    vectorizer = TfidfVectorizer(stop_words=None)
-    tfidf = vectorizer.fit_transform([text1, text2])
-
-    # Cálculo de la similitud coseno entre los vectores TF-IDF de los textos
-    sim_cos = cosine_similarity(tfidf[0], tfidf[1])
-
-    return sim_cos[0][0]
-
-
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -55,7 +34,7 @@ def compare_lists(list1, list2):
     text1 = " ".join(list1)
     text2 = " ".join(list2)
 
-    # Vectorización de los textos utilizando TF-IDF sin eliminar stopwords
+    # Vectorización de los textos utilizando TF-IDF 
     vectorizer = TfidfVectorizer()
     tfidf = vectorizer.fit_transform([text1, text2])
 
@@ -64,7 +43,6 @@ def compare_lists(list1, list2):
 
     return sim_cos[0][0]
 
-"""
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -82,10 +60,6 @@ def compara_texto_original(text1, text2):
     sim_cos = cosine_similarity(tfidf[0], tfidf[1])
 
     return sim_cos[0][0]
-
-
-
-
 
 
 ################################################################
@@ -110,6 +84,25 @@ def leer_txt(nombre_archivo):
     return texto_completo
 
 ################################################################
+
+from nltk.corpus import stopwords
+
+def eliminar_stopwords(lista_palabras):
+    # Obtenemos las stopwords para español
+    stop_words_es = set(stopwords.words('spanish'))
+    # Obtenemos las stopwords para inglés
+    stop_words_en = set(stopwords.words('english'))
+
+    stop_words_personalizadas = ['cada','este','cómo']
+    # Combinamos ambos conjuntos de stopwords
+    stop_words = stop_words_es.union(stop_words_en).union(stop_words_personalizadas)
+
+    # Eliminamos las stopwords de la lista de palabras
+    lista_sin_stopwords = [palabra for palabra in lista_palabras if not palabra.lower() in stop_words]
+    
+    return lista_sin_stopwords
+
+#####################################################################
 import string
 
 def eliminar_puntuaciones(tokens):
@@ -119,21 +112,62 @@ def eliminar_puntuaciones(tokens):
     tokens_sin_puntuacion = [token for token in tokens if token not in signos_puntuacion]
     return tokens_sin_puntuacion
 
-####################################################################
 
-from nltk.corpus import stopwords
+def eliminar_caracteres(cadena):
+    caracteres = ['"', "'", ",", ";",":",".","-","“","”","°"]
+    for caracter in caracteres:
+        cadena = cadena.replace(caracter, "")
+    return cadena
 
-
-def eliminar_stopwords(lista_palabras):
-    # Obtenemos las stopwords para español
-    stop_words = set(stopwords.words('spanish'))
-    
-    # Eliminamos las stopwords de la lista de palabras
-    lista_sin_stopwords = [palabra for palabra in lista_palabras if not palabra.lower() in stop_words]
-    
-    return lista_sin_stopwords
 #####################################################################
+import re
 
+def eliminar_links(cadena):
+    # Expresión regular para detectar enlaces
+    patron = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+    
+    # Eliminar los enlaces utilizando la expresión regular
+    cadena_sin_links = re.sub(patron, "", cadena)
+    return cadena_sin_links
+
+
+
+def eliminar_parentesis_corchetes(lista):
+    lista_sin_parentesis_corchetes = []
+    for elemento in lista:
+        elemento_sin_parentesis_corchetes = elemento.replace("(", "").replace(")", "").replace("[", "").replace("]", "")
+        lista_sin_parentesis_corchetes.append(elemento_sin_parentesis_corchetes)
+    return lista_sin_parentesis_corchetes
+
+import re
+
+
+def eliminar_numeros_lista(lista):
+    patron_numeros = r'\d+(?:,\d+)*(?:\.\d+)?'
+    lista_sin_numeros = [re.sub(patron_numeros, '', cadena).strip() for cadena in lista]
+    return lista_sin_numeros
+
+
+def eliminar_caracteres_unicos(lista):
+    lista_filtrada = [palabra for palabra in lista if len(set(palabra)) > 1]
+    return lista_filtrada
+
+
+#####################################################################
+from nltk.stem import SnowballStemmer
+
+def algoritmo_snowball(lista_palabras):
+    # Se crea una instancia del stemmer de Snowball para español
+    stemmer = SnowballStemmer("spanish")
+    # Aplicamos stemming a cada palabra
+    stemmed = [stemmer.stem(palabra) for palabra in lista_palabras]
+    
+    return stemmed
+
+def obtener_bigramas(lista_elementos):
+    # Obtenemos los bigramas
+    bigramas = [lista_elementos[i] + " " + lista_elementos[i+1] for i in range(len(lista_elementos)-1)]
+    return bigramas
 
 
 # FIN Funciones punto 2
@@ -200,17 +234,49 @@ while True:
         for archivo in lista_archivos_txt:
             # Leer el archivo PDF de la lista de TXTs
             texto_documentos = leer_txt(archivo)
-            documentos_txt.append(texto_documentos)  
+            documentos_txt.append(texto_documentos)
         
+        
+        
+        clear_screen()
+        print("Se  necesita primero definir el documento PDF para usar en la prueba de comparacion\n")       
+        while True:
+                    try:
+                        numero = int(input("Ingresa un numero del documento de prueba del 1 al 5: "))
+                        if 1 <= numero <= 5:
+                            break
+                        else:
+                            print("El número debe estar en el rango del 1 al 5.")
+                            
+                    except ValueError:
+                        print("Error: Debes ingresar un número entero.")
+        
+        input("\nPresione enter para continuar al submenu de opciones...")
 
-             
-        ##########################################################################################
+        docupdflistlimpios=[]
+
+        for docupdf in documentos_pdf:
+            docupdf=eliminar_links(docupdf)
+            docupdf=eliminar_caracteres(docupdf)
+
+            lista = docupdf.split()
+            lista = [elemento.lower() for elemento in lista]
+            
+            lista=eliminar_parentesis_corchetes(lista)
+            lista=eliminar_numeros_lista(lista)
+            lista = list(filter(None, lista))
+            lista=eliminar_stopwords(lista)
+            lista=eliminar_caracteres_unicos(lista)
+            docupdflistlimpios.append(lista)
+
+
+##########################################################################################
+
 
 
         while True:
             clear_screen()
-            print("¡Has ingresado la opcion 2 del menú!"+"\n\n")
-            print("¡Selecciona un opcion para lo cual trabajar!"+"\n\n")
+            print("¡Ahora selecciona un opcion para lo cual trabajar con el documento de prueba!"+"\n\n")
             print("1. Con el texto original")
             print("2. Eliminando stop-words")
             print("3. Realizando stemming")
@@ -220,83 +286,37 @@ while True:
             subopcion = input("Ingrese una opción: ")
             if subopcion == "1":
                 clear_screen()
-
-
-
-                """
-                docupdflist=[]
-
-                for docupdf in documentos_pdf:
-                    cadena = docupdf
-                    lista = cadena.split()
-                    docupdflist.append(lista)
-                """
                 
-
-                print("Texto original de los documentos PDFs\n")
-
-                
-                """
-                max_similitud = 0.0
-                doc1_max = ""
-                doc2_max = ""
-
-                for i in range(len(documentos_pdf)):
-                    for j in range(i+1, len(documentos_pdf)):
-                        similitud = compara_texto_original(documentos_pdf[i], documentos_pdf[j])
-                        if similitud > max_similitud:
-                            max_similitud = similitud
-                            doc1_max = "Texto {}".format(i+1)
-                            doc2_max = "Texto {}".format(j+1)
-                        print("Similitud coseno: {:.2f} entre la texto {} con en el texto {} asi tambien entre la texto {} con el texto {}".format(similitud, i+1, j+1, j+1, i+1))
-
-                print("\nLa máxima similitud de {:.2f} se encuentra entre {} y {} o entre el {} y el {}\n".format(max_similitud, doc1_max, doc2_max,doc2_max,doc1_max))
-                """
-                while True:
-                    try:
-                        numero = int(input("\nIngresa un numero del documento de prueba del 1 al 5: "))
-                        if 1 <= numero <= 5:
-                            break
-                        else:
-                            print("El número debe estar en el rango del 1 al 5.")
-                    except ValueError:
-                        print("Error: Debes ingresar un número entero.")
-                
-
+                print("Texto original de los documentos PDFs")
                 # Obtener un índice dentro del rango de la lista
                 indice_docu = numero-1
-
                 # Obtener el elemento correspondiente al índice aleatorio
                 elemento = lista_archivos_pdf[indice_docu]
-    
                 # Imprimir el índice y el elemento elegido
-                print("\nDocumento para elegido para la prueba es el : {}\n".format(elemento))
-
-
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
                 copialistapdfs=list(lista_archivos_pdf)
                 # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
                 del copialistapdfs[indice_docu]
-
                 #Copia de la lista de documentos original para trabajar
                 aux_documentos_pdf=list(documentos_pdf)
                 del aux_documentos_pdf[indice_docu]
-
                 #Se establece los elementos del documento de prueba
                 docprueba=documentos_pdf[indice_docu]
 
-                #Se comienza hacer la comparacion
 
+                #Se comienza hacer la comparacion
                 max_similitud = 0.0
                 doc1_max = ""
 
+                print("\nResultado de comparaciones...\n")
                 for i in range(len(aux_documentos_pdf)):
                     similitud = compara_texto_original(docprueba, aux_documentos_pdf[i])
                     if similitud > max_similitud:
                         max_similitud = similitud
                         doc1_max = copialistapdfs[i]
-                    print("Similitud coseno: {:.2f} entre el {} con en el  {}".format(similitud,elemento,copialistapdfs[i]))
-                
-                print("\nLa máxima similitud de {:.2f} se encuentra entre {} y {}\n".format(max_similitud,elemento,doc1_max))
+                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
@@ -306,13 +326,157 @@ while True:
 
                 input("Presione enter para continuar...")
             elif subopcion == "2":
+
+
                 clear_screen()
+                print("Eliminando STOPWORDs del texto original de los documentos PDFs")
+
+                # Obtener un índice dentro del rango de la lista
+                indice_docu = numero-1
+                # Obtener el elemento correspondiente al índice aleatorio
+                elemento = lista_archivos_pdf[indice_docu]
+                # Imprimir el índice y el elemento elegido
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
+                copialistapdfs=list(lista_archivos_pdf)
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
+                del copialistapdfs[indice_docu]
+
+
+
+                #Copia de la lista de documentos sin stopwords para trabajar
+                aux_documentos_pdf=list(docupdflistlimpios)
+
+                #Se establece los elementos del documento de prueba
+                docprueba=aux_documentos_pdf[indice_docu]
+                del aux_documentos_pdf[indice_docu]
+
+
+                #Se comienza hacer la comparacion
+                max_similitud = 0.0
+                doc1_max = ""
+
+                print("\nResultado de comparaciones...\n")
+                for i in range(len(aux_documentos_pdf)):
+                    similitud = compare_lists(docprueba, aux_documentos_pdf[i])
+                    if similitud > max_similitud:
+                        max_similitud = similitud
+                        doc1_max = copialistapdfs[i]
+                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
+
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistapdfs=list(lista_archivos_pdf)
+                aux_documentos_pdf=list(docupdflistlimpios)
+                
+
+
                 input("Presione enter para continuar...")
             elif subopcion == "3":
                 clear_screen()
+                print("Realizando STEMMING de los documentos PDFs")
+
+                # Obtener un índice dentro del rango de la lista
+                indice_docu = numero-1
+                # Obtener el elemento correspondiente al índice aleatorio
+                elemento = lista_archivos_pdf[indice_docu]
+                # Imprimir el índice y el elemento elegido
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
+
+                copialistapdfs=list(lista_archivos_pdf)
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
+                del copialistapdfs[indice_docu]
+
+
+                #Copia de la lista de documentos sin stopwords para trabajar
+                aux_documentos_pdf=list(docupdflistlimpios)
+
+                listdocustemm=[]
+
+                for docu in aux_documentos_pdf:
+                    docu=algoritmo_snowball(docu)
+                    listdocustemm.append(docu)
+                
+
+                print(listdocustemm[0])
+
+                #Se establece los elementos del documento de prueba
+                docprueba=listdocustemm[indice_docu]
+                del listdocustemm[indice_docu]
+
+
+                
+
+                
+                #Se comienza hacer la comparacion
+                max_similitud = 0.0
+                doc1_max = ""
+
+                print("\nResultado de comparaciones...\n")
+                for i in range(len(listdocustemm)):
+                    similitud = compare_lists(docprueba, listdocustemm[i])
+                    if similitud > max_similitud:
+                        max_similitud = similitud
+                        doc1_max = copialistapdfs[i]
+                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistapdfs=list(lista_archivos_pdf)
+                
+
                 input("Presione enter para continuar...")   
             elif subopcion == "4":
                 clear_screen()
+                print("Realizando BI-GRAMAS de los documentos PDFs")
+
+                # Obtener un índice dentro del rango de la lista
+                indice_docu = numero-1
+                # Obtener el elemento correspondiente al índice aleatorio
+                elemento = lista_archivos_pdf[indice_docu]
+                # Imprimir el índice y el elemento elegido
+                print("\nEl documento elegido para la prueba es el : {}\n".format(elemento))
+
+                copialistapdfs=list(lista_archivos_pdf)
+                # Eliminar el elemento en el índice de la lista necesario para evitar valores repetidos
+                del copialistapdfs[indice_docu]
+
+
+                #Copia de la lista de documentos sin stopwords para trabajar
+                aux_documentos_pdf=list(docupdflistlimpios)
+
+                listdocubigramm=[]
+
+                for docu in aux_documentos_pdf:
+                    docu=obtener_bigramas(docu)
+                    listdocubigramm.append(docu)
+                
+
+                print(listdocubigramm[0])
+
+                #Se establece los elementos del documento de prueba
+                docprueba=listdocubigramm[indice_docu]
+                del listdocubigramm[indice_docu]
+
+
+                #Se comienza hacer la comparacion
+                max_similitud = 0.0
+                doc1_max = ""
+
+                print("\nResultado de comparaciones...\n")
+                for i in range(len(listdocubigramm)):
+                    similitud = compare_lists(docprueba, listdocubigramm[i])
+                    if similitud > max_similitud:
+                        max_similitud = similitud
+                        doc1_max = copialistapdfs[i]
+                    print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
+                print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
+
+                #Se restaura los valores originales para no alterar en una segunda iteracion
+                copialistapdfs=list(lista_archivos_pdf)
+
+
+
                 input("Presione enter para continuar...") 
             elif subopcion == "5":
                 break
