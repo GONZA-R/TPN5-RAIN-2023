@@ -174,7 +174,7 @@ def obtener_bigramas(lista_elementos):
 #####################################################################################################
 import openpyxl
 
-def generar_excel(ranking,nombre):
+def generar_excel(ranking,nombre,color):
 
     # Crear un nuevo archivo Excel
     libro_excel = openpyxl.Workbook()
@@ -186,6 +186,13 @@ def generar_excel(ranking,nombre):
     hoja.cell(row=1, column=3).value = "Documento"
     hoja.cell(row=1, column=4).value = "Contenido"
 
+    # Agregar color a las celdas de los títulos de noticias #ELiminar si esta mal
+    for i in range(1, 5):
+        hoja.cell(row=1, column=i).fill = openpyxl.styles.PatternFill(start_color=color, end_color=color, fill_type='solid')
+
+    for i in range(2, 5): 
+        hoja.cell(row=i, column=1).fill = openpyxl.styles.PatternFill(start_color=color, end_color=color, fill_type='solid')
+   
 
     # Guardar los resultados en el archivo Excel
     fila = 2
@@ -198,6 +205,32 @@ def generar_excel(ranking,nombre):
 
     # Guardar el archivo Excel
     libro_excel.save(nombre)
+
+
+from openpyxl import load_workbook
+
+def modificar_formato_columnas_xlsx(nom_archivo):
+    # Cargar el archivo existente
+    book = load_workbook(nom_archivo)
+
+    # Seleccionar la hoja a modificar
+    sheet = book.active
+
+    # Modificar el formato de las columnas
+    for col in sheet.columns:
+        max_length = 0
+        column = col[0].column_letter
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
+        sheet.column_dimensions[column].width = adjusted_width
+
+    # Guardar los cambios en el archivo existente
+    book.save(nom_archivo)
 
 #####################################################################################################
 
@@ -373,7 +406,9 @@ while True:
                 copialistapdfs=list(lista_archivos_pdf)
                 aux_documentos_pdf=list(documentos_pdf)
 
-                generar_excel(ranking,"RepA_TextoOriginal_PDFs.xlsx")
+                generar_excel(ranking,"RepA_TextoOriginal_PDFs.xlsx","FFFF00")
+                modificar_formato_columnas_xlsx("RepA_TextoOriginal_PDFs.xlsx")
+
                 print("\nSe genero un archivo Excel con los resultados del REP A...\n")
                 input("\nPresione enter para continuar...\n")
                 clear_screen()
@@ -428,7 +463,8 @@ while True:
                 copialistatxts=list(lista_archivos_txt)
                 aux_documentos_txt=list(documentos_txt)
 
-                generar_excel(ranking,"RepB_TextoOriginal_TXTs.xlsx")
+                generar_excel(ranking,"RepB_TextoOriginal_TXTs.xlsx","FFFF00")
+                modificar_formato_columnas_xlsx("RepB_TextoOriginal_TXTs.xlsx")
                 print("\nSe genero un archivo Excel con los resultados del REP B...\n")
 
 
@@ -487,7 +523,8 @@ while True:
                 copialistapdfs=list(lista_archivos_pdf)
                 aux_documentos_pdf=list(docupdflistlimpios)
 
-                generar_excel(ranking,"RepA_SinStopWords_PDFs.xlsx")
+                generar_excel(ranking,"RepA_SinStopWords_PDFs.xlsx","FFA500")
+                modificar_formato_columnas_xlsx("RepA_SinStopWords_PDFs.xlsx")
                 print("\nSe genero un archivo Excel con los resultados del REP A...\n")
                 input("\nPresione enter para continuar...\n")
                 clear_screen()
@@ -544,7 +581,8 @@ while True:
                 copialistatxts=list(lista_archivos_txt)
                 aux_documentos_txt=list(docutxtlistlimpios)
 
-                generar_excel(ranking,"RepB_SinStopWords_TXTs.xlsx")
+                generar_excel(ranking,"RepB_SinStopWords_TXTs.xlsx","FFA500")
+                modificar_formato_columnas_xlsx("RepB_SinStopWords_TXTs.xlsx")
                 print("\nSe genero un archivo Excel con los resultados del REP B...\n")
 
 
@@ -610,7 +648,8 @@ while True:
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
 
-                generar_excel(ranking,"RepA_Stemming_PDFs.xlsx")
+                generar_excel(ranking,"RepA_Stemming_PDFs.xlsx","00FF00")
+                modificar_formato_columnas_xlsx("RepA_Stemming_PDFs.xlsx")
                 print("\nSe genero un archivo Excel con los resultados del REP A...\n")
                 input("\nPresione enter para continuar...\n")
                 clear_screen()
@@ -673,7 +712,8 @@ while True:
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistatxts=list(lista_archivos_txt)
 
-                generar_excel(ranking,"RepB_Stemming_PDFs.xlsx")
+                generar_excel(ranking,"RepB_Stemming_TXTs.xlsx","00FF00")
+                modificar_formato_columnas_xlsx("RepB_Stemming_TXTs.xlsx")
                 print("\nSe genero un archivo Excel con los resultados del REP B...\n")
          
 
@@ -735,7 +775,8 @@ while True:
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
 
-                generar_excel(ranking,"RepA_BIGRAMAS_PDFs.xlsx")
+                generar_excel(ranking,"RepA_BIGRAMAS_PDFs.xlsx","ADD8E6")
+                modificar_formato_columnas_xlsx("RepA_BIGRAMAS_PDFs.xlsx")
                 print("\nSe genero un archivo Excel con los resultados del REP A...\n")
                 input("\nPresione enter para continuar...\n")
                 clear_screen()
@@ -795,7 +836,8 @@ while True:
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_txt)
 
-                generar_excel(ranking,"RepB_BIGRAMAS_PDFs.xlsx")
+                generar_excel(ranking,"RepB_BIGRAMAS_TXTs.xlsx","ADD8E6")
+                modificar_formato_columnas_xlsx("RepB_BIGRAMAS_TXTs.xlsx")
                 print("\nSe genero un archivo Excel con los resultados del REP B...\n")
 
                 input("Presione enter para continuar...") 
