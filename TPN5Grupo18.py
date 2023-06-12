@@ -13,8 +13,10 @@ def clear_screen():
 
 def calcular_indices(recuperados, relevantes_consulta,cant_reg_relevantes):
     recall = relevantes_consulta / cant_reg_relevantes # Total de documentos relevantes en la base de datos
+    recall=recall*100
     recall="{:.2f}%".format(recall)
     precision = relevantes_consulta / recuperados
+    precision=precision*100
     precision="{:.2f}%".format(precision)
     return recall, precision
 
@@ -44,6 +46,7 @@ def compare_lists(list1, list2):
     return sim_cos[0][0]
 
 
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.corpus import stopwords
@@ -60,6 +63,8 @@ def compara_texto_original(text1, text2):
     sim_cos = cosine_similarity(tfidf[0], tfidf[1])
 
     return sim_cos[0][0]
+
+    
 
 
 ################################################################
@@ -104,14 +109,6 @@ def eliminar_stopwords(lista_palabras):
 
 #####################################################################
 import string
-
-def eliminar_puntuaciones(tokens):
-    # Obtener los signos de puntuación
-    signos_puntuacion = set(string.punctuation)
-    # Crear una nueva lista sin signos de puntuación
-    tokens_sin_puntuacion = [token for token in tokens if token not in signos_puntuacion]
-    return tokens_sin_puntuacion
-
 
 def eliminar_caracteres(cadena):
     caracteres = ['"', "'", ",", ";",":",".","-","“","”","°"]
@@ -232,6 +229,18 @@ def modificar_formato_columnas_xlsx(nom_archivo):
     # Guardar los cambios en el archivo existente
     book.save(nom_archivo)
 
+####################################################################################################
+
+def mostrar_ranking(similitudes):
+    similitudes.sort(reverse=True)
+    ranking = similitudes[:3]
+
+    print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
+    for i, (similitud, documento,contenido) in enumerate(ranking):
+        print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+    return ranking
+
+
 #####################################################################################################
 
 while True:
@@ -253,17 +262,16 @@ while True:
         cant_reg_relevantes=int(input("Ingrese cantidad de ducumentos relevantes para la consulta: "))
         cant_no_relevantes=cant_reg_base_dato-cant_reg_relevantes
         print("Cantidad de documentos no relevantes para la consulta:",cant_no_relevantes)
-
-    
+        print("\n")
         recuperados = int(input("Ingrese el número de documentos recuperados: "))
         relevantes_consulta = int(input("Ingrese el número de documentos relevantes para la consulta: "))
 
         recall, precision = calcular_indices(recuperados, relevantes_consulta,cant_reg_relevantes)
 
-        print("Índice de Recuperación: ", recall)
-        print("Índice de Precisión: ", precision)
+        print("\nÍndice de Recuperación: ", recall)
+        print("\nÍndice de Precisión: ", precision)
 
-        input("Presione enter para continuar...")
+        input("\nPresione enter para continuar...")
 
            
     
@@ -296,7 +304,7 @@ while True:
         
         
         clear_screen()
-        print("Se  necesita primero definir el documento PDF para usar en la prueba de comparacion\n")       
+        print("Se  necesita  definir el documento PDF para usar en la prueba de comparacion\n")       
         while True:
                     try:
                         numero = int(input("Ingresa un numero del documento de prueba del 1 al 5: "))
@@ -308,7 +316,21 @@ while True:
                     except ValueError:
                         print("Error: Debes ingresar un número entero.")
         
+
+        print("\nAhora se necesita  definir el documento TXT para usar en la prueba de comparacion\n")       
+        while True:
+                    try:
+                        numero2 = int(input("Ingresa un numero del documento de prueba del 1 al 10: "))
+                        if 1 <= numero2 <= 10:
+                            break
+                        else:
+                            print("El número debe estar en el rango del 1 al 10.")
+                            
+                    except ValueError:
+                        print("Error: Debes ingresar un número entero.")
+        
         input("\nPresione enter para continuar al submenu de opciones...")
+
 
         docupdflistlimpios=[]
 
@@ -393,14 +415,7 @@ while True:
                     similitudes.append((similitud, copialistapdfs[i],aux_documentos_pdf[i]))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
 
-
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
-                
+                ranking=mostrar_ranking(similitudes)
                 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
@@ -419,7 +434,7 @@ while True:
                 print("REP B Texto original de los documentos TXTs")
 
                 # Obtener un índice dentro del rango de la lista
-                indice_docu = numero-1
+                indice_docu = numero2-1
                 # Obtener el elemento correspondiente al índice aleatorio
                 elemento = lista_archivos_txt[indice_docu]
                 # Imprimir el índice y el elemento elegido
@@ -450,13 +465,7 @@ while True:
                     similitudes.append((similitud, copialistatxts[i],aux_documentos_txt[i]))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
 
-
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                ranking=mostrar_ranking(similitudes)
                 
                 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
@@ -511,13 +520,8 @@ while True:
                     similitudes.append((similitud, copialistapdfs[i],' '.join(aux_documentos_pdf[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
 
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
                 
+                ranking=mostrar_ranking(similitudes)
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
@@ -535,7 +539,7 @@ while True:
 
 
                  # Obtener un índice dentro del rango de la lista
-                indice_docu = numero-1
+                indice_docu = numero2-1
                 # Obtener el elemento correspondiente al índice aleatorio
                 elemento = lista_archivos_txt[indice_docu]
                 # Imprimir el índice y el elemento elegido
@@ -569,14 +573,8 @@ while True:
                     similitudes.append((similitud, copialistatxts[i],' '.join(aux_documentos_txt[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
 
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                ranking=mostrar_ranking(similitudes)
                 
-
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistatxts=list(lista_archivos_txt)
                 aux_documentos_txt=list(docutxtlistlimpios)
@@ -636,14 +634,7 @@ while True:
                     similitudes.append((similitud, copialistapdfs[i],' '.join(listdocustemm[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
                 
-
-
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                ranking=mostrar_ranking(similitudes)
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
@@ -659,7 +650,7 @@ while True:
                 print("REP B Realizando STEMMING de los documentos TXTs")
 
                 # Obtener un índice dentro del rango de la lista
-                indice_docu = numero-1
+                indice_docu = numero2-1
                 # Obtener el elemento correspondiente al índice aleatorio
                 elemento = lista_archivos_txt[indice_docu]
                 # Imprimir el índice y el elemento elegido
@@ -700,14 +691,7 @@ while True:
                     similitudes.append((similitud, copialistatxts[i],' '.join(listdocustemm[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
                 
-
-
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                ranking=mostrar_ranking(similitudes)
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistatxts=list(lista_archivos_txt)
@@ -764,14 +748,8 @@ while True:
                     print("Similitud coseno: {:.2f} entre el {} con el  {}".format(similitud,elemento,copialistapdfs[i]))
                     similitudes.append((similitud, copialistapdfs[i],' '.join(listdocubigramm[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
-
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
-
+                ranking=mostrar_ranking(similitudes)
+                
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_pdf)
 
@@ -786,7 +764,7 @@ while True:
                 print("REP B Realizando BI-GRAMAS de los documentos PDFs")
 
                 # Obtener un índice dentro del rango de la lista
-                indice_docu = numero-1
+                indice_docu = numero2-1
                 # Obtener el elemento correspondiente al índice aleatorio
                 elemento = lista_archivos_txt[indice_docu]
                 # Imprimir el índice y el elemento elegido
@@ -826,12 +804,7 @@ while True:
                     similitudes.append((similitud, copialistatxts[i],' '.join(listdocubigramm[i])))
                 print("\nLa máxima similitud de {:.2f} se encuentra entre el {} y el {}\n".format(max_similitud,elemento,doc1_max))
 
-                similitudes.sort(reverse=True)
-                ranking = similitudes[:3]
-
-                print("\nLos 3 documentos con mayor similitud con el {} son:\n".format(elemento))
-                for i, (similitud, documento,contenido) in enumerate(ranking):
-                    print("Rank {}: Similitud coseno: {:.2f} - Documento: {}".format(i+1, similitud, documento))
+                ranking=mostrar_ranking(similitudes)
 
                 #Se restaura los valores originales para no alterar en una segunda iteracion
                 copialistapdfs=list(lista_archivos_txt)
